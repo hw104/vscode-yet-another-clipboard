@@ -1,26 +1,126 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "yac" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('yac.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Yet Another Clipboard!');
-	});
-
-	context.subscriptions.push(disposable);
+  context.subscriptions.push(
+    vscode.commands.registerCommand("yac.copy", () => {
+      copy(context);
+      vscode.commands.executeCommand("editor.action.clipboardCopyAction");
+    })
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("yac.cut", () => {
+      copy(context);
+      vscode.commands.executeCommand("editor.action.clipboardCutAction");
+    })
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("yac.clear", () => clear(context))
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("yac.paste", () => paste(context))
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("yac.pickAndPaste", () =>
+      pickAndPaste(context)
+    )
+  );
 }
 
-// this method is called when your extension is deactivated
+function getSelectedText(
+  doc: vscode.TextDocument,
+  selection: vscode.Selection
+): string {
+  return doc.getText(new vscode.Range(selection.start, selection.end));
+}
+
+function getLineText(
+  doc: vscode.TextDocument,
+  selection: vscode.Selection
+): string {
+  return doc.getText(doc.lineAt(selection.start.line).rangeIncludingLineBreak);
+}
+
+function copy(context: vscode.ExtensionContext) {
+  console.log("copy");
+
+  const doc = vscode.window.activeTextEditor?.document;
+  const selection = vscode.window.activeTextEditor?.selection;
+  if (doc == null || selection == null) {
+    return;
+  }
+
+  const text = getSelectedText(doc, selection) || getLineText(doc, selection);
+  if (text.length === 0) {
+    return;
+  }
+
+  console.log("copyZ", text);
+
+  const prevHitory = context.workspaceState.get<string[]>("history", []);
+  const bufferSize = vscode.workspace
+    .getConfiguration("yac")
+    .get<number>("bufferSize", 10);
+  const newHitory = [text, ...prevHitory.filter((e) => e !== text)].slice(
+    0,
+    bufferSize
+  );
+  context.workspaceState.update("history", newHitory);
+}
+
+function clear(context: vscode.ExtensionContext) {
+  context.workspaceState.update("history", []);
+}
+
+async function paste(context: vscode.ExtensionContext) {
+  console.log("paste");
+  const history = context.workspaceState.get<string[]>("history", []);
+  if (history.length === 0) {
+    return;
+  }
+
+  console.log("paste", "1.5");
+
+  const editor = vscode.window.activeTextEditor;
+  if (editor == null) {
+    return;
+  }
+
+  console.log("paste 2");
+
+  const doc = editor.document;
+  const selection = editor.selection;
+  const selected = getSelectedText(doc, selection);
+  const text =
+    history[
+      selected.length === 0
+        ? 0
+        : (history.findIndex((s) => s === selected) + 1) % history.length
+    ];
+  console.log("toPaste", text);
+
+  await editor.edit((builder) =>
+    editor.selections.forEach((sel) => builder.replace(sel, text))
+  );
+}
+
+async function pickAndPaste(context: vscode.ExtensionContext) {
+  const editor = vscode.window.activeTextEditor;
+  if (editor == null) {
+    return;
+  }
+  const history = context.workspaceState.get<string[]>("history", []);
+
+  const text = await vscode.window.showQuickPick(history, {
+    title: "YAC: Paste from hitory",
+  });
+  if (text == null) {
+    return;
+  }
+
+  await editor.edit((builder) =>
+    editor.selections.forEach((sel) => builder.replace(sel, text))
+  );
+}
+
+// this method is called when  extension is deactivated
 export function deactivate() {}

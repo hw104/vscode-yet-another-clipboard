@@ -1,7 +1,7 @@
 {
   "name": "yac",
   "displayName": "Yet Another Clipboard",
-  "description": "",
+  "description": "Yet another clipboard history extension. Includes no keyboard shortcuts.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.70.0"
@@ -10,14 +10,34 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:yac.helloWorld"
+    "onCommand:yac.copy",
+    "onCommand:yac.cut",
+    "onCommand:yac.clear",
+    "onCommand:yac.paste",
+    "onCommand:pickAndPaste"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "yac.helloWorld",
-        "title": "Hello World"
+        "command": "yac.copy",
+        "title": "YAC: Copy"
+      },
+      {
+        "command": "yac.cut",
+        "title": "YAC: Cut"
+      },
+      {
+        "command": "yac.clear",
+        "title": "YAC: Clear"
+      },
+      {
+        "command": "yac.paste",
+        "title": "YAC: Paste"
+      },
+      {
+        "command": "yac.pickAndPaste",
+        "title": "YAC: Pick and Paste"
       }
     ]
   },
