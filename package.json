@@ -2,9 +2,12 @@
   "name": "yac",
   "displayName": "Yet Another Clipboard",
   "description": "Yet another clipboard history extension. Includes no keyboard shortcuts.",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "publisher": "hw104",
-  "repository": "https://github.com/hw104/vscode-yet-another-clipboard.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hw104/vscode-yet-another-clipboard.git"
+  },
   "license": "MIT",
   "engines": {
     "vscode": "^1.70.0"
@@ -40,7 +43,7 @@
       },
       {
         "command": "yac.list",
-        "title": "YAC: Show history, paste or delete"
+        "title": "YAC: List"
       }
     ],
     "configuration": {
