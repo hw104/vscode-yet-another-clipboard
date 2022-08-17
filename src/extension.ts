@@ -26,6 +26,8 @@ export function activate(context: vscode.ExtensionContext) {
   );
 }
 
+export function deactivate() {}
+
 function getSelectedText(
   doc: vscode.TextDocument,
   selection: vscode.Selection
@@ -142,5 +144,3 @@ async function pickAndPaste(context: vscode.ExtensionContext) {
     editor.selections.forEach((sel) => builder.replace(sel, result.detail!))
   );
 }
-
-export function deactivate() {}

@@ -3,6 +3,9 @@
   "displayName": "Yet Another Clipboard",
   "description": "Yet another clipboard history extension. Includes no keyboard shortcuts.",
   "version": "0.0.1",
+  "publisher": "hw104",
+  "repository": "https://github.com/hw104/vscode-yet-another-clipboard.git",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.70.0"
   },
@@ -43,6 +46,8 @@
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
+    "vs:package": "vsce package --yarn",
+    "vs:publish": "vsce publish --yarn",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile && yarn run lint",
