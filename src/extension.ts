@@ -128,7 +128,7 @@ async function list(context: vscode.ExtensionContext) {
       },
     ])
     .flat();
-    vscode.window.createQuickPick
+    // vscode.window.createQuickPick
   const result = await vscode.window.showQuickPick(items, {
     title: "YAC: Paste from hitory",
     matchOnDescription: true,
