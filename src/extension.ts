@@ -20,9 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("yac.paste", () => paste(context))
   );
   context.subscriptions.push(
-    vscode.commands.registerCommand("yac.pickAndPaste", () =>
-      pickAndPaste(context)
-    )
+    vscode.commands.registerCommand("yac.list", () => list(context))
   );
 }
 
@@ -111,7 +109,7 @@ async function paste(context: vscode.ExtensionContext) {
   );
 }
 
-async function pickAndPaste(context: vscode.ExtensionContext) {
+async function list(context: vscode.ExtensionContext) {
   const editor = vscode.window.activeTextEditor;
   if (editor == null) {
     return;
@@ -130,6 +128,7 @@ async function pickAndPaste(context: vscode.ExtensionContext) {
       },
     ])
     .flat();
+    vscode.window.createQuickPick
   const result = await vscode.window.showQuickPick(items, {
     title: "YAC: Paste from hitory",
     matchOnDescription: true,

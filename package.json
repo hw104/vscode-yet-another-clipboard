@@ -17,7 +17,7 @@
     "onCommand:yac.cut",
     "onCommand:yac.clear",
     "onCommand:yac.paste",
-    "onCommand:yac.pickAndPaste"
+    "onCommand:yac.list"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -39,10 +39,21 @@
         "title": "YAC: Paste"
       },
       {
-        "command": "yac.pickAndPaste",
-        "title": "YAC: Pick and Paste"
+        "command": "yac.list",
+        "title": "YAC: Show history, paste or delete"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Yet Another Clipboard",
+      "properties": {
+        "yac.bufferSize": {
+          "type": "integer",
+          "default": 10,
+          "description": "Maximum size of the history buffer.",
+          "markdownDescription": "Maximum size of the history buffer."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
