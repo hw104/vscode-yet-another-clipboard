@@ -14,7 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
   context.subscriptions.push(
-    vscode.commands.registerCommand("yac.clear", () => clear(context))
+    vscode.commands.registerCommand("yac.clear", () => saveHistory(context, []))
   );
   context.subscriptions.push(
     vscode.commands.registerCommand("yac.paste", () => paste(context))
@@ -40,9 +40,23 @@ function getLineText(
   return doc.getText(doc.lineAt(selection.start.line).rangeIncludingLineBreak);
 }
 
-function copy(context: vscode.ExtensionContext) {
-  console.log("copy");
+interface Item {
+  text: string;
+  createdAt: number;
+}
 
+function getHistory(context: vscode.ExtensionContext): Item[] {
+  return context.workspaceState.get<Item[]>("history", []);
+}
+
+async function saveHistory(
+  context: vscode.ExtensionContext,
+  history: Item[]
+): Promise<void> {
+  await context.workspaceState.update("history", history);
+}
+
+async function copy(context: vscode.ExtensionContext): Promise<void> {
   const doc = vscode.window.activeTextEditor?.document;
   const selection = vscode.window.activeTextEditor?.selection;
   if (doc == null || selection == null) {
@@ -54,38 +68,31 @@ function copy(context: vscode.ExtensionContext) {
     return;
   }
 
-  console.log("copyZ", text);
-
-  const prevHitory = context.workspaceState.get<string[]>("history", []);
+  const prevHitory = getHistory(context);
   const bufferSize = vscode.workspace
     .getConfiguration("yac")
     .get<number>("bufferSize", 10);
-  const newHitory = [text, ...prevHitory.filter((e) => e !== text)].slice(
-    0,
-    bufferSize
-  );
-  context.workspaceState.update("history", newHitory);
-}
+  const newHitory: Item[] = [
+    {
+      text,
+      createdAt: Date.now(),
+    },
+    ...prevHitory.filter((e) => e.text !== text),
+  ].slice(0, bufferSize);
 
-function clear(context: vscode.ExtensionContext) {
-  context.workspaceState.update("history", []);
+  await saveHistory(context, newHitory);
 }
 
 async function paste(context: vscode.ExtensionContext) {
-  console.log("paste");
-  const history = context.workspaceState.get<string[]>("history", []);
+  const history = getHistory(context);
   if (history.length === 0) {
     return;
   }
-
-  console.log("paste", "1.5");
 
   const editor = vscode.window.activeTextEditor;
   if (editor == null) {
     return;
   }
-
-  console.log("paste 2");
 
   const doc = editor.document;
   const selection = editor.selection;
@@ -94,12 +101,11 @@ async function paste(context: vscode.ExtensionContext) {
     history[
       selected.length === 0
         ? 0
-        : (history.findIndex((s) => s === selected) + 1) % history.length
+        : (history.findIndex((s) => s.text === selected) + 1) % history.length
     ];
-  console.log("toPaste", text);
 
   await editor.edit((builder) =>
-    editor.selections.forEach((sel) => builder.replace(sel, text))
+    editor.selections.forEach((sel) => builder.replace(sel, text.text))
   );
 }
 
@@ -108,17 +114,17 @@ async function pickAndPaste(context: vscode.ExtensionContext) {
   if (editor == null) {
     return;
   }
-  const history = context.workspaceState.get<string[]>("history", []);
+  const history = getHistory(context);
 
   const items = history
     .map<vscode.QuickPickItem[]>((e, i) => [
       {
-        label: new Date(Date.now()).toLocaleString(),
+        label: new Date(e.createdAt).toLocaleString(),
         kind: vscode.QuickPickItemKind.Separator,
       },
       {
         label: i.toString(),
-        detail: e,
+        detail: e.text,
       },
     ])
     .flat();
