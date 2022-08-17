@@ -14,7 +14,7 @@
     "onCommand:yac.cut",
     "onCommand:yac.clear",
     "onCommand:yac.paste",
-    "onCommand:pickAndPaste"
+    "onCommand:yac.pickAndPaste"
   ],
   "main": "./out/extension.js",
   "contributes": {

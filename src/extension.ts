@@ -110,17 +110,31 @@ async function pickAndPaste(context: vscode.ExtensionContext) {
   }
   const history = context.workspaceState.get<string[]>("history", []);
 
-  const text = await vscode.window.showQuickPick(history, {
+  const items = history
+    .map<vscode.QuickPickItem[]>((e, i) => [
+      {
+        label: new Date(Date.now()).toLocaleString(),
+        kind: vscode.QuickPickItemKind.Separator,
+      },
+      {
+        label: i.toString(),
+        detail: e,
+      },
+    ])
+    .flat();
+  const result = await vscode.window.showQuickPick(items, {
     title: "YAC: Paste from hitory",
+    matchOnDescription: true,
+    matchOnDetail: true,
+    placeHolder: "Filter",
   });
-  if (text == null) {
+  if (result == null) {
     return;
   }
 
   await editor.edit((builder) =>
-    editor.selections.forEach((sel) => builder.replace(sel, text))
+    editor.selections.forEach((sel) => builder.replace(sel, result.detail!))
   );
 }
 
-// this method is called when  extension is deactivated
 export function deactivate() {}
