@@ -2,7 +2,7 @@
   "name": "yac",
   "displayName": "Yet Another Clipboard",
   "description": "Yet another clipboard history extension. Includes no keyboard shortcuts.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "hw104",
   "repository": {
     "type": "git",
@@ -10,7 +10,7 @@
   },
   "license": "MIT",
   "engines": {
-    "vscode": "^1.70.0"
+    "vscode": "^1.81.0"
   },
   "categories": [
     "Other"
@@ -51,7 +51,7 @@
       "properties": {
         "yac.bufferSize": {
           "type": "integer",
-          "default": 10,
+          "default": 20,
           "description": "Maximum size of the history buffer.",
           "markdownDescription": "Maximum size of the history buffer."
         }
@@ -72,16 +72,14 @@
     "@types/glob": "^7.2.0",
     "@types/mocha": "^9.1.1",
     "@types/node": "16.x",
-    "@types/vscode": "^1.70.0",
+    "@types/vscode": "^1.81.0",
     "@typescript-eslint/eslint-plugin": "^5.31.0",
     "@typescript-eslint/parser": "^5.31.0",
     "@vscode/test-electron": "^2.1.5",
     "eslint": "^8.20.0",
     "glob": "^8.0.3",
     "mocha": "^10.0.0",
-    "typescript": "^4.7.4"
-  },
-  "dependencies": {
-    "vsce": "^2.10.0"
+    "typescript": "^4.7.4",
+    "vsce": "^2.15.0"
   }
 }

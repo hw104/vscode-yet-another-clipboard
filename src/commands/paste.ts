@@ -22,7 +22,14 @@ export async function paste(context: vscode.ExtensionContext) {
         : (history.findIndex((s) => s.text === selected) + 1) % history.length
     ];
 
-  await editor.edit((builder) =>
-    editor.selections.forEach((sel) => builder.replace(sel, text.text))
+  let befores: vscode.Selection[] = [];
+  await editor.edit((builder) => {
+    for (const sel of editor.selections) {
+      befores.push(new vscode.Selection(sel.anchor, sel.active));
+      builder.replace(sel, text.text);
+    }
+  });
+  editor.selections = befores.map(
+    (b, i) => new vscode.Selection(b.start, editor.selections[i].end)
   );
 }
